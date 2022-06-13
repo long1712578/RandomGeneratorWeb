@@ -4,6 +4,9 @@ import Pagination from "react-bootstrap/Pagination";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import WheelComponent from "react-wheel-of-prizes";
+import React, { Component, useState } from "react";
+import swal from 'sweetalert';
 
 function App() {
   let active = 2;
@@ -16,39 +19,44 @@ function App() {
     );
   }
 
-  var isPercentage = true;
-      var prizes = [
-              {
-                text: "Áo thun J2Team",
-                img: "images/Ao.png",
-                number: 1, // 1%,
-                percentpage: 0.01 // 1%
-              },
-              {
-                text: "Nón J2 Team",
-                img: "images/Non.png",
-                number: 1,
-                percentpage: 0.05 // 5%
-              },
-              {
-                text: "Vòng Tay J2Team",
-                img: "images/Vong.png",
-                number : 1,
-                percentpage: 0.1 // 10%
-              },
-              {
-                text: "J2Team Security",
-                img: "images/j2_logo.png",
-                number: 1,
-                percentpage: 0.24 // 24%
-              },
-              {
-                text: "Chúc bạn may mắn lần sau",
-                img: "images/miss.png",
-                percentpage: 0.6 // 60%
-              },
-            ];
-            
+  const [points, setPoints] = useState(false);
+  const segments = [
+    "Long",
+    "Đức",
+    "Lân",
+    "Kỳ",
+    "Thành",
+    "Lực",
+    "Hòa",
+    "Tình"
+  ];
+  const segColors = [
+    "#EE4040",
+    "#F0CF50",
+    "#815CD1",
+    "#3DA5E0",
+    "#34A24F",
+    "#F9AA1F",
+    "#EC3F3F",
+    "#FF9000"
+  ];
+  const onFinished = (winner) => {
+    swal({
+      title: "Chúc mừng chiến thắng của:",
+      text: winner,
+      icon: "success",
+      dangerMode: true,
+    }
+    )
+  };
+
+  const ponitschek = () => {
+    if (!points) {
+      alert("get more points");
+    } else {
+    }
+  };
+
   return (
     <div className="App">
       {/* header */}
@@ -64,20 +72,19 @@ function App() {
       </Navbar>
       <div className="body-bg">
         {/* vong quay */}
-        <div className="wrapper typo" id="wrapper">
-          <section id="luckywheel" className="hc-luckywheel">
-            <div className="hc-luckywheel-container">
-              <canvas className="hc-luckywheel-canvas" width="500px" height="500px">
-                Vòng Xoay May Mắn
-              </canvas>
-            </div>
-            <a className="hc-luckywheel-btn">
-              Xoay
-            </a>
-          </section>
-        </div>
+        <WheelComponent
+          segments={segments}
+          segColors={segColors}
+          winningSegment="won 60"
+          onFinished={(winner) => onFinished(winner)}
+          primaryColor="black"
+          contrastColor="white"
+          buttonText="Xoay"
+          isOnlyOnce={false}
+        />
       </div>
       {/* history */}
+      <br />
       <h3>Lịch sử giao dịch</h3>
       <div className="container">
         <Table striped bordered hover>
