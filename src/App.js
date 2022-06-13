@@ -5,11 +5,14 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import WheelComponent from "react-wheel-of-prizes";
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 import swal from 'sweetalert';
+import Swal from "sweetalert2";
 
 function App() {
   let [transations, setTransations] = useState([]);
+  const listCode = ['long', 'duy', 'linh'];
+  const [isAuthen, setIsAuthen] = useState(false);
   const segments = [
     "Long",
     "Đức",
@@ -45,6 +48,39 @@ function App() {
     transations = [...transations,transation];
     setTransations(transations);
   };
+
+  const enterCode = () => {
+    Swal.fire({
+      title: "Vòng quay bị khoá!",
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      showCancelButton: false, // Có hiển thị nút cancel không(true = có)
+      confirmButtonText: 'Nhập',
+      showLoaderOnConfirm: true,
+      preConfirm: (value) => {
+        console.log(value);
+        let check = listCode.find(c => c === value);
+        if(check){
+          return true;
+        }
+        else{
+          Swal.showValidationMessage("Vui lòng nhập lại, mã chưa đúng?")
+          return false;
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+  }).then(result => {
+    setIsAuthen(true);
+    Swal.fire("Nhập mã thành công, mời bạn quay thưởng.")
+  });
+  }
+  useEffect(() => {
+    if(isAuthen === false){
+      enterCode();
+    }
+  },isAuthen)
 
   return (
     <div className="App">
