@@ -9,17 +9,7 @@ import React, { Component, useState } from "react";
 import swal from 'sweetalert';
 
 function App() {
-  let active = 2;
-  let items = [];
-  for (let number = 1; number <= 5; number++) {
-    items.push(
-      <Pagination.Item key={number} active={number === active}>
-        {number}
-      </Pagination.Item>
-    );
-  }
-
-  const [points, setPoints] = useState(false);
+  let [transations, setTransations] = useState([]);
   const segments = [
     "Long",
     "Đức",
@@ -41,20 +31,19 @@ function App() {
     "#FF9000"
   ];
   const onFinished = (winner) => {
+    const transation = {
+      address: '0xab',
+      reward: winner,
+      createTime: new Date().toDateString()
+    };
     swal({
       title: "Chúc mừng chiến thắng của:",
       text: winner,
       icon: "success",
       dangerMode: true,
-    }
-    )
-  };
-
-  const ponitschek = () => {
-    if (!points) {
-      alert("get more points");
-    } else {
-    }
+    });
+    transations = [...transations,transation];
+    setTransations(transations);
   };
 
   return (
@@ -85,35 +74,41 @@ function App() {
       </div>
       {/* history */}
       <br />
-      <h3>Lịch sử giao dịch</h3>
+      {transations.length}
+      <h3>Lịch sử quay</h3>
       <div className="container">
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Username</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>1</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Jacob</td>
-              <td>Thornton</td>
-              <td>@fat</td>
-            </tr>
-          </tbody>
-        </Table>
-        <div className="d-flex justify-content-center">
-          <Pagination>{items}</Pagination>
-        </div>
+        {
+          transations.length > 0 ?
+            (<div>
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Địa chỉ</th>
+                    <th>Phần thưởng</th>
+                    <th>Thời gian</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    transations.map((item, i) => {
+                      return <tr key={i}>
+                        <td>{i+1}</td>
+                        <td>{item.address}</td>
+                        <td>{item.reward}</td>
+                        <td>{item.createTime}</td>
+                      </tr>
+                    })
+                  }
+                </tbody>
+              </Table>
+              {/* <div className="d-flex justify-content-center">
+              <Pagination>{items}</Pagination>
+            </div> */}
+            </div>)
+            :
+            (<div>Danh sách trống</div>)
+        }
       </div>
     </div>
   );
