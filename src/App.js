@@ -8,6 +8,7 @@ import WheelComponent from "react-wheel-of-prizes";
 import React, { Component, useState, useEffect } from "react";
 import swal from 'sweetalert';
 import Swal from "sweetalert2";
+import Web3 from "web3";
 
 function App() {
   let [transations, setTransations] = useState([]);
@@ -45,7 +46,7 @@ function App() {
       icon: "success",
       dangerMode: true,
     });
-    transations = [...transations,transation];
+    transations = [...transations, transation];
     setTransations(transations);
   };
 
@@ -62,25 +63,47 @@ function App() {
       preConfirm: (value) => {
         console.log(value);
         let check = listCode.find(c => c === value);
-        if(check){
+        if (check) {
+          onConnectionWeb3();
           return true;
         }
-        else{
+        else {
           Swal.showValidationMessage("Vui lòng nhập lại, mã chưa đúng?")
           return false;
         }
       },
       allowOutsideClick: () => !Swal.isLoading()
-  }).then(result => {
-    setIsAuthen(true);
-    Swal.fire("Nhập mã thành công, mời bạn quay thưởng.")
-  });
+    }).then(result => {
+      setIsAuthen(true);
+      Swal.fire("Nhập mã thành công, mời bạn quay thưởng.")
+    });
   }
   useEffect(() => {
-    if(isAuthen === false){
+    if (isAuthen === false) {
       enterCode();
     }
-  },isAuthen)
+  }, isAuthen)
+
+  const onConnectionWeb3 = async () => {
+
+    if (window.ethereum) {
+      console.log('hello 1')
+      window.web3 = new Web3(window.window.ethereum);
+      try {
+        await window.ethereum.enable();
+      } catch (error) {
+        console.log('User denided account access')
+      }
+    } else if (window.web3) {
+      console.log('hello 2')
+      window.web3 = new Web3(web3.currentProvider);
+    } else {
+      console.log('connection fail');
+    }
+    console.log('web3 window', window.web3);
+    let account = await web3.eth.getAccounts();
+    console.log('web3', account);
+  }
 
   return (
     <div className="App">
@@ -129,7 +152,7 @@ function App() {
                   {
                     transations.map((item, i) => {
                       return <tr key={i}>
-                        <td>{i+1}</td>
+                        <td>{i + 1}</td>
                         <td>{item.address}</td>
                         <td>{item.reward}</td>
                         <td>{item.createTime}</td>
