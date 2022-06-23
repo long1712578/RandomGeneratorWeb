@@ -95,7 +95,7 @@ function App() {
       "constant": true
     }
   ];
-  const onFinished = (winner) => {
+  const onFinished = async (winner) => {
     const transation = {
       address: '0xab',
       reward: winner,
@@ -109,6 +109,16 @@ function App() {
     });
     transations = [...transations, transation];
     setTransations(transations);
+    let randContract = new window.web3.eth.Contract(contractABI, randAddress);
+    console.log(randContract);
+    let owner = await randContract.methods.owner().call();
+    console.log('owner', owner);
+    let rand = randContract.methods.randRange(0, 9).call();
+    rand.then(res => {
+      console.log('rand', res);
+    }).catch((err) => {
+      console.log('err', err);
+    })
   };
 
   const enterCode = () => {
@@ -162,16 +172,6 @@ function App() {
     }
     let account = await window.web3.eth.getAccounts();
     console.log('web3', account);
-    let randContract = new window.web3.eth.Contract(contractABI, randAddress);
-    console.log(randContract);
-    let owner = await randContract.methods.owner().call();
-    console.log('owner', owner);
-    let rand = randContract.methods.randSingle().call();
-    rand.then(res => {
-      console.log('rand', res);
-    }).catch((err) => {
-      console.log('err', err);
-    })
   }
 
   return (
@@ -187,59 +187,92 @@ function App() {
           </Nav>
         </Container>
       </Navbar>
-      <div className="body-bg">
-        {/* vong quay */}
-        <WheelComponent
-          segments={segments}
-          segColors={segColors}
-          winningSegment="won 60"
-          onFinished={(winner) => onFinished(winner)}
-          primaryColor="black"
-          contrastColor="white"
-          buttonText="Xoay"
-          isOnlyOnce={false}
-        />
-      </div>
-      {/* history */}
-      <br />
-      {transations.length}
-      <h3>Lịch sử quay</h3>
       <div className="container">
-        {
-          transations.length > 0 ?
-            (<div>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>STT</th>
-                    <th>Địa chỉ</th>
-                    <th>Phần thưởng</th>
-                    <th>Thời gian</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    transations.map((item, i) => {
-                      return <tr key={i}>
-                        <td>{i + 1}</td>
-                        <td>{item.address}</td>
-                        <td>{item.reward}</td>
-                        <td>{item.createTime}</td>
-                      </tr>
-                    })
-                  }
-                </tbody>
-              </Table>
-              {/* <div className="d-flex justify-content-center">
+      <div className="card-group">
+          {/* 1 */}
+          <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/c/c5/Dice-1.png" alt="Card image cap" />
+            <div classname="card-body">
+                <h5 className="card-title">Mặt thứ I</h5>
+            </div>
+          </button>
+          {/* 2 */}
+          <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/1/18/Dice-2.png" alt="Card image cap" />
+              <div classname="card-body">
+                <h5 className="card-title">Mặt thứ II</h5>
+              </div>
+          </button>
+           {/* 3 */}
+           <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/7/70/Dice-3.png" alt="Card image cap" />
+            <div classname="card-body">
+                <h5 className="card-title">Mặt thứ III</h5>
+            </div>
+          </button>
+          {/* 4 */}
+          <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Dice-4.png" alt="Card image cap" />
+            <div classname="card-body">
+                <h5 className="card-title">Mặt thứ IV</h5>
+              </div>
+          </button>
+           {/* 5 */}
+           <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Dice-5.png" alt="Card image cap" />
+            <div classname="card-body">
+                <h5 className="card-title">Mặt thứ V</h5>
+              </div>
+          </button>
+          {/* 6 */}
+          <button class="card">
+            <img className="card-img-top" src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Dice-6.png" alt="Card image cap" />
+            <div classname="card-body">
+                <h5 className="card-title">Mặt thứ VI</h5>
+              </div>
+          </button>
+        </div>
+      </div>
+        {/* history */}
+        <br />
+        {transations.length}
+        <h3>Lịch sử quay</h3>
+        <div className="container">
+          {
+            transations.length > 0 ?
+              (<div>
+                <Table striped bordered hover>
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Địa chỉ</th>
+                      <th>Phần thưởng</th>
+                      <th>Thời gian</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {
+                      transations.map((item, i) => {
+                        return <tr key={i}>
+                          <td>{i + 1}</td>
+                          <td>{item.address}</td>
+                          <td>{item.reward}</td>
+                          <td>{item.createTime}</td>
+                        </tr>
+                      })
+                    }
+                  </tbody>
+                </Table>
+                {/* <div className="d-flex justify-content-center">
               <Pagination>{items}</Pagination>
             </div> */}
-            </div>)
-            :
-            (<div>Danh sách trống</div>)
-        }
+              </div>)
+              :
+              (<div>Danh sách trống</div>)
+          }
+        </div>
       </div>
-    </div>
-  );
+      );
 }
 
-export default App;
+      export default App;
