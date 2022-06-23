@@ -34,6 +34,8 @@ function App() {
     "#EC3F3F",
     "#FF9000"
   ];
+  const randAddress = "0x2e9EE18D1BE414103941b5F5F83DF4101E444c1b";
+  const contractABI = [ { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "historyInfos", "outputs": [ { "internalType": "address", "name": "player", "type": "address" }, { "internalType": "uint256", "name": "reward", "type": "uint256" } ], "stateMutability": "view", "type": "function", "constant": true }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function", "constant": true }, { "inputs": [], "name": "randSingle", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function", "constant": true }, { "inputs": [ { "internalType": "uint256", "name": "a", "type": "uint256" }, { "internalType": "uint256", "name": "b", "type": "uint256" } ], "name": "randRange", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function", "constant": true } ];
   const onFinished = (winner) => {
     const transation = {
       address: '0xab',
@@ -87,22 +89,29 @@ function App() {
   const onConnectionWeb3 = async () => {
 
     if (window.ethereum) {
-      console.log('hello 1')
-      window.web3 = new Web3(window.window.ethereum);
+      window.web3 = new Web3(window.ethereum);
       try {
         await window.ethereum.enable();
       } catch (error) {
         console.log('User denided account access')
       }
     } else if (window.web3) {
-      console.log('hello 2')
-      window.web3 = new Web3(web3.currentProvider);
+      window.web3 = new Web3(window.web3.currentProvider);
     } else {
       console.log('connection fail');
     }
-    console.log('web3 window', window.web3);
-    let account = await web3.eth.getAccounts();
+    let account = await window.web3.eth.getAccounts();
     console.log('web3', account);
+    let randContract = new window.web3.eth.Contract(contractABI, randAddress);
+    console.log(randContract);
+    let owner = await randContract.methods.owner().call();
+    console.log('owner', owner);
+    let rand = randContract.methods.randSingle().call();
+    rand.then(res => {
+      console.log('rand', res);
+    }).catch((err) => {
+      console.log('err', err);
+    })
   }
 
   return (
