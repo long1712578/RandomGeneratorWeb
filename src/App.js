@@ -14,68 +14,17 @@ function App() {
   const listCode = ["long", "duy", "linh"];
   const [isAuthen, setIsAuthen] = useState(false);
   const [address, setAddress] = useState();
-  
-  const onFinished = async (winner) => {
-    const transation = {
-      address: "0xab",
-      reward: winner,
-      createTime: new Date().toDateString(),
-    };
-    swal({
-      title: "Chúc mừng chiến thắng của:",
-      text: winner,
-      icon: "success",
-      dangerMode: true,
-    });
-    transations = [...transations, transation];
-    setTransations(transations);
-    let randContract = new window.web3.eth.Contract(contractABI, randAddress);
-    console.log(randContract);
-    let owner = await randContract.methods.owner().call();
-    console.log("owner", owner);
-    let rand = randContract.methods.randRange(0, 9).call();
-    rand
-      .then((res) => {
-        console.log("rand", res);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
-  };
+  const [lcContract, setLcContract] = useState()
+  const [lotteryPot, setLotteryPot] = useState()
+  const [lotteryPlayers, setPlayers] = useState([])
+  const [lotteryHistory, setLotteryHistory] = useState([])
 
-  const enterCode = () => {
-    Swal.fire({
-      title: "Vòng quay bị khoá!",
-      input: "text",
-      inputAttributes: {
-        autocapitalize: "off",
-      },
-      showCancelButton: false, // Có hiển thị nút cancel không(true = có)
-      confirmButtonText: "Nhập",
-      showLoaderOnConfirm: true,
-      preConfirm: (value) => {
-        console.log(value);
-        let check = listCode.find((c) => c === value);
-        if (check) {
-          onConnectionWeb3();
-          return true;
-        } else {
-          Swal.showValidationMessage("Vui lòng nhập lại, mã chưa đúng?");
-          return false;
-        }
-      },
-      allowOutsideClick: () => !Swal.isLoading(),
-    }).then((result) => {
-      setIsAuthen(true);
-      Swal.fire("Nhập mã thành công, mời bạn quay thưởng.");
-    });
-  };
   useEffect(() => {
-    if (isAuthen === false) {
-      enterCode();
-    }
-  }, isAuthen);
+    if(lcContract) getPot();
+    if(lcContract) getPlayers();
+  }, [lcContract]);
 
+  // Kết nối với metamask
   const onConnectionWeb3 = async () => {
     if (window.ethereum) {
       console.log(window.ethereum);
@@ -97,6 +46,34 @@ function App() {
     console.log("web3", accounts);
   };
 
+  // Lấy pot
+  const getPot = async() => {
+    const pot = await lcContract.methods.getBalance().call();
+    console.log('event pot', pot);
+    setLotteryPot(web3.ultils.fromWei(pot, 'ether'));
+  }
+
+  //Lấy danh sách người chơi
+  const getPlayers = async() => {
+    const players = await lcContract.methods.getPlayers().call();
+    console.log('danh sachs nguoi choi', players);
+    setPlayers(players);
+  }
+
+  // Xo so
+  const enterLotteryHandle = async() => {
+    try {
+      await lcContract.methods.enter().send({
+        from:address,
+        value: '15000000000000000',
+        gas: 300000,
+        priceGas: null
+      })
+    }catch(err) {
+      console.log(err);
+    }
+  }
+
   return (
     <div className="App">
       {/* header */}
@@ -114,8 +91,8 @@ function App() {
           <div className="col">
             <section className="mt-5">
               <p>Nhấn enter thì xổ số sẽ gửi 0.01 eth</p>
-              <button type="button" className="btn btn-primary">
-                Tiếp tục chơi
+              <button type="button" className="btn btn-primary" onClick={enterLotteryHandle()}>
+                Tiếp tục chơi 
               </button>
             </section>
 
@@ -149,9 +126,9 @@ function App() {
             <section className="mt-5">
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">POT (10eth)</h5>
+                  <h5 class="card-title">POT</h5>
                   <p class="card-text">
-                    10 Ether
+                    {lotteryPot} Ether
                   </p>
                 </div>
               </div>
